@@ -29,6 +29,8 @@ const getBook = async (req, res) => {
     }
 };
 
+// get all books
+
 const getAllBooks = async (req, res) => {
     try {
         const books = await Book.find();    

@@ -1,83 +1,32 @@
-const express = require('express');
+const express = require("express");
+const mongoose = require("mongoose");
+require("dotenv").config();
+
+const bookRoutes = require("./src/routes/bookRoute");
 
 const app = express();
+const PORT = process.env.PORT || 5000;
 
+// Middleware to read JSON
 app.use(express.json());
 
-const PORT = 3000;
+// Register book routes
+app.use("/api/books", bookRoutes);
 
-const books = [
-  {
-    id: 1,
-    title: 'Things Fall Apart',
-    author: 'Chinua Achebe',
-    price: 5000
+// Start the server after connecting to MongoDB
+const startServer = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+
+    console.log("MongoDB connected successfully");
+
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error("Failed to start:", error.message);
+    process.exit(1);
   }
-];
+};
 
-//GET all books
-
-app.get("/books", (req, res) => {
-  res.json(books);
-});
-
-//Get one book
-
-app.get("/books/:id", (req, res) => {
-  const id = Number(req.params.id);
-  const book = books.find((book) => book.id === id);
-
-  if (!book) {
-    return res.status(404).json({ message: "Book not found" });
-  }
-  res.json(book);
-});
-
-//Create a new book
-app.post("/books", (req, res) => {
-  const newBook = {
-    id: books.length + 1,
-    title: req.body.title,
-    author: req.body.author,
-    price: req.body.price
-  };
-  books.push(newBook);
-  res.status(201).json(newBook);
-});
-
-
-//Update a book
-app.put("/books/:id", (req, res) => {
-  const id = Number(req.params.id);
-  const book = books.find((book) => book.id === id);
-
-  if (!book) {
-    return res.status(404).json({ message: "Book not found" });
-  }
-
-  book.title = req.body.title;
-  book.author = req.body.author;
-  book.price = req.body.price;
-
-  res.json(book);
-});
-
-
-
-//delete a book
-
-app.delete("/books/:id", (req, res) => {
-  const id = Number(req.params.id);
-  const index = books.findIndex((book) => book.id === id);
-
-  if (index === -1) {
-    return res.status(404).json({ message: "Book not found" });
-  }
-
-  books.splice(index, 1);
-  res.json({ message: "Book deleted" });
-});
-
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+startServer();
