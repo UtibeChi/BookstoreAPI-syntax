@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 require("dotenv").config();
+const userRoutes = require("./src/routes/userRoute");
 
 const bookRoutes = require("./src/routes/bookRoute");
 
@@ -12,6 +13,7 @@ app.use(express.json());
 
 // Register book routes
 app.use("/api/books", bookRoutes);
+app.use("/api/users", userRoutes);
 
 // Start the server after connecting to MongoDB
 const startServer = async () => {
